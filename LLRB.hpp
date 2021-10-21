@@ -36,7 +36,7 @@ namespace MyLLRB {
 		void leftrotate(Node * last);
 		void rightrotate(Node * last);
 		void split4nodes();
-		void adjust(Node * last);
+		bool adjust(Node * last);
 	};
 	template<class KEYType, class VALUEType>		//Init nodes' ptr
 	LLRB<KEYType,VALUEType>::Node::Node(const LLRB& llrb) {
@@ -100,14 +100,17 @@ namespace MyLLRB {
 		this->color = 1;
 	}
 	template<class KEYType, class VALUEType>
-	void LLRB<KEYType,VALUEType>::Node::adjust(Node * last){
+	bool LLRB<KEYType,VALUEType>::Node::adjust(Node * last){
+		int flag = 0;
 		if(this->left->color && this->right->color){
 			this->split4nodes();
+			flag = 1;
 		}
 		if(this->left->color && this->left->left->color){
 			Node * tmp = this->left;
 			this->rightrotate(last);
 			tmp->split4nodes();
+			flag = 1;
 		}
 		else if(this->left->color && this->left->right->color){
 			this->left->leftrotate(this);
@@ -117,7 +120,9 @@ namespace MyLLRB {
 		}
 		if(this->right->color){
 			this->leftrotate(last);
+			flag = 1;
 		}
+		return flag;
 	}
 	
 
@@ -132,42 +137,44 @@ namespace MyLLRB {
 	}
 	template<class KEYType, class VALUEType>		//insert a element to LLRB tree
 	void LLRB<KEYType,VALUEType>::insert(KEYType key,VALUEType value) {
-			if (!this->rooted) {
-				this->root->key = key;
-				this->root->value = value;
-				this->root->color = 0;
-				this->rooted = 1;
-				++ Element_num;
+		bool adjusted = 0;
+		if (!this->rooted) {
+			this->root->key = key;
+			this->root->value = value;
+			this->root->color = 0;
+			this->rooted = 1;
+			++ Element_num;
+			return;
+		}
+		Node * current = this->root;
+		Node * last = nullptr;
+		if(current->left->color && current->right->color){
+			current->left->color = 0;
+			current->right->color = 0;
+		}
+		else if(current->right->color){
+			this->root = current->right;
+			current->right = this->root->left;
+			this->root->left = current;
+			current->color = 1;
+			this->root->color = 0;
+			current = this->root;
+		}
+		while(current->nil!=1){
+			last = current;
+			if(current->value == value){
+				current->value = value;
+				current->key = key;
 				return;
 			}
-			Node * current = this->root;
-			Node * last = nullptr;
-			if(current->left->color && current->right->color){
-				current->left->color = 0;
-				current->right->color = 0;
+			else if(current->value>value){
+				current = current->left;
 			}
-			else if(current->right->color){
-				this->root = current->right;
-				current->right = this->root->left;
-				this->root->left = current;
-				current->color = 1;
-				this->root->color = 0;
-				current = this->root;
+			else{
+				current = current->right;
 			}
-			while(current->nil!=1){
-				last = current;
-				if(current->value == value){
-					current->value = value;
-					current->key = key;
-					return;
-				}
-				else if(current->value>value){
-					current = current->left;
-				}
-				else{
-					current = current->right;
-				}
-				current->adjust(last);
+			adjusted = current->adjust(last);
+			if(adjusted){
 				current = last;
 				if(current->value>value){
 					current = current->left;
@@ -175,19 +182,19 @@ namespace MyLLRB {
 				else{
 					current = current->right;
 				}
+				adjusted = 0;
 			}
-			Node * node = new Node(*this);
-			node->InitNode(key, value, 1);
-			if(value > last->value){
-				last->right = node;
-			}
-			else{
-				last->left = node;
-			}
-			++ Element_num;
-			//test
-			// std::printf("%d", this->root->right->value);
 		}
+		Node * node = new Node(*this);
+		node->InitNode(key, value, 1);
+		if(value > last->value){
+			last->right = node;
+		}
+		else{
+			last->left = node;
+		}
+		++ Element_num;
+	}
 
 	template<class KEYType, class VALUEType>		//insert a element to LLRB tree
 	long int LLRB<KEYType,VALUEType>::size(){
