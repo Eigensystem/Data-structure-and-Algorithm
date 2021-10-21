@@ -136,7 +136,7 @@ namespace MyLLRB {
 		root = new Node(*this);
 	}
 	template<class KEYType, class VALUEType>		//insert a element to LLRB tree
-	void LLRB<KEYType,VALUEType>::insert(KEYType key,VALUEType value) {
+	void LLRB<KEYType,VALUEType>::insert(KEYType key, VALUEType value) {
 		bool adjusted = 0;
 		if (!this->rooted) {
 			this->root->key = key;
@@ -148,7 +148,14 @@ namespace MyLLRB {
 		}
 		Node * current = this->root;
 		Node * last = nullptr;
-		if(current->left->color && current->right->color){
+		if(current->left->color && current->left->left->color){
+			this->root = current->left;
+			current->left = this->root->right;
+			this->root->right = current;
+			this->root->color = 0;
+			this->root->left->color = 0;
+		}
+		else if(current->left->color && current->right->color){
 			current->left->color = 0;
 			current->right->color = 0;
 		}
