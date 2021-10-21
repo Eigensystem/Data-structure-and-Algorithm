@@ -159,7 +159,6 @@ namespace MyLLRB {
 				if(current->value == value){
 					current->value = value;
 					current->key = key;
-					++Element_num;
 					return;
 				}
 				else if(current->value>value){
