@@ -331,11 +331,11 @@ namespace MyLLRB {
 			delnode->key = current->key;
 			delnode->value = current->value;
 			delete current;
+			last->left = this->Nil;
 			return 1;
 			//fixup here
 		}
 		else{
-			current->adjust(last);
 			if(!current->left->color && !current->left->left->color){
 				current->colordown();
 				this->Nil->color = 0;
@@ -363,7 +363,6 @@ namespace MyLLRB {
 			return 1;
 		}
 		else{
-			current->adjust(last);
 			if(current->key == key){											//current is going to be deleted & right child is not nil
 				delnode = current;												//to find the min node in the right child tree
 				if(!current->right->left->color){

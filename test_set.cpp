@@ -34,7 +34,7 @@ int main(){
 	check(myset, 40);
 	myset->show();
 	std::cout << std::endl;
-	myset->erase(20);
+	myset->erase(35);
 	myset->show();
 	// std::printf("%d\n", myset.empty());
 	// std::printf("%ld\n", myset->size());
