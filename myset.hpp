@@ -15,6 +15,7 @@ namespace Myset{
 		void insert(const Type&value);
 		int erase(const Type&value);
 		int count(const Type&value);
+		void show();
 	};
 
 	template<class Type>
@@ -34,7 +35,7 @@ namespace Myset{
 
 	template<class Type>
 	void set<Type>::insert(const Type&value){
-		this->llrb_tree->insert(value, value);
+		this->llrb_tree->insert(value, value, this->llrb_tree->root, nullptr);
 	}
 
 	template<class Type>
@@ -42,8 +43,17 @@ namespace Myset{
 		this->llrb_tree->CleartheTree();
 	}
 
+	template<class Type>
+	void set<Type>::show(){
+		this->llrb_tree->Showall(this->llrb_tree->root, 1);
+	}
 	// template<class Type>
 	// int set<Type>::count(const Type&value){
 		
 	// }
+
+	template<class Type>
+	int set<Type>::erase(const Type &value){
+		return this->llrb_tree->Delstart(value);
+	}
 }
