@@ -6,7 +6,7 @@ namespace Myqueue{
 		MyFibheap::Fibheap<Type,Type> * fibheap;
 
 		priority_queue();
-		// ~priority_queue();
+		~priority_queue();
 		void push(const Type& value);
 		void pop();
 		int size() const;
@@ -17,6 +17,11 @@ namespace Myqueue{
 	template<typename Type>
 	priority_queue<Type>::priority_queue(){
 		this->fibheap = new MyFibheap::Fibheap<Type, Type>;
+	}
+
+	template<typename Type>
+	priority_queue<Type>::~priority_queue(){
+		delete this->fibheap;
 	}
 
 	template<typename Type>

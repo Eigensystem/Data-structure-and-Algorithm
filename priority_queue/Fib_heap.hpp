@@ -13,6 +13,7 @@ namespace MyFibheap {
 	public:
 		int node_num;
 		Fibheap();
+		~Fibheap();
 		void insert(KEYType key, VALUEType value);
 		VALUEType extract_max();
 		VALUEType showmax();
@@ -38,6 +39,7 @@ namespace MyFibheap {
 
 		Node(const Fibheap&);
 		void InitNil();
+		void delall(Fibheap&);
 		void dellink();
 		void linktoroot(Fibheap&);
 		void InitNode(KEYType key, VALUEType value, Node * left, Node * right, Node * parent, Node * child);
@@ -50,6 +52,22 @@ namespace MyFibheap {
 		this->Nil->InitNil();
 		this->Max = this->Nil;
 	}
+	template<typename KEYType, typename VALUEType>
+	Fibheap<KEYType,VALUEType>::~Fibheap(){
+		if(this->Max != this->Nil){
+			Node * current = this->Max;
+			do{
+				current->delall(*this);
+				Node * tmp = current->right;
+				delete current;
+				current = tmp;
+			}while(current == this->Max);
+		}
+		delete this->Nil;
+		this->Max = nullptr;
+		this->node_num = 0;
+	}
+
 
 	template<typename KEYType, typename VALUEType>
 	Fibheap<KEYType,VALUEType>::Node::Node(const Fibheap& fibheap){
@@ -80,6 +98,21 @@ namespace MyFibheap {
 		this->child = child;
 	}
 	template<typename KEYType, typename VALUEType>
+	void Fibheap<KEYType,VALUEType>::Node::delall(Fibheap& fibheap){
+		if(this->child == fibheap.Nil){
+			return;
+		}
+		else{
+			Node * current = this->child;
+			do{
+				current->delall(fibheap);
+				Node * tmp = current->right;
+				delete current;
+				current = tmp;
+			}while(current != this->child);
+		}
+	}
+	template<typename KEYType, typename VALUEType>
 	void Fibheap<KEYType,VALUEType>::Node::dellink(){
 		this->left->right = this->right;
 		this->right->left = this->left;
@@ -102,7 +135,6 @@ namespace MyFibheap {
 			return this->Max->value;
 		}
 	}
-
 	template<typename KEYType, typename VALUEType>
 	void Fibheap<KEYType,VALUEType>::insert(KEYType key, VALUEType value){
 		Node * node = new Node(*this);
@@ -120,14 +152,12 @@ namespace MyFibheap {
 		}
 		++this->node_num;
 	}
-
 	template<typename KEYType, typename VALUEType>
 	int Fibheap<KEYType,VALUEType>::calcu_size(){
 		int num = this->node_num;
 		double size = (sqrt(5) + 1)/2;
 		return log(num)/log(size);
 	}
-
 	template<typename KEYType, typename VALUEType>
 	void Fibheap<KEYType,VALUEType>::heap_insert(Node * insertee, Node * inserter){
 		inserter->dellink();
@@ -147,7 +177,6 @@ namespace MyFibheap {
 			inserter->parent = insertee;
 		}
 	}
-
 	template<typename KEYType, typename VALUEType>
 	void Fibheap<KEYType,VALUEType>::heap_consolidate(){
 		int size = calcu_size()+1;
@@ -173,7 +202,6 @@ namespace MyFibheap {
 			current = current->right;
 		}while(current!=this->Max);
 	}
-
 	template<typename KEYType, typename VALUEType>
 	VALUEType Fibheap<KEYType,VALUEType>::extract_max(){
 		VALUEType value;
