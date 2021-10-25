@@ -30,6 +30,7 @@ namespace MyFibheap {
 		VALUEType value;
 		int degree;
 		bool nil;
+		bool mark;
 		Node * left;
 		Node * right;
 		Node * parent;
@@ -130,7 +131,7 @@ namespace MyFibheap {
 	template<typename KEYType, typename VALUEType>
 	void Fibheap<KEYType,VALUEType>::heap_insert(Node * insertee, Node * inserter){
 		inserter->dellink();
-		insertee->degree += (inserter->degree + 1);
+		++insertee->degree;
 		if(insertee->child == this->Nil){
 			insertee->child = inserter;
 			inserter->parent = insertee;
@@ -150,7 +151,7 @@ namespace MyFibheap {
 	template<typename KEYType, typename VALUEType>
 	void Fibheap<KEYType,VALUEType>::heap_consolidate(){
 		int size = calcu_size()+1;
-		Node * consolidate_arr[size] = malloc(size*8);
+		Node * consolidate_arr[size];
 		for(int i=0; i<size; i++){
 			consolidate_arr[i] = this->Nil;
 		}
@@ -159,14 +160,13 @@ namespace MyFibheap {
 			int index = current->degree;
 			while(consolidate_arr[index]!=this->Nil){
 				if(consolidate_arr[index]->key > current->key){
-					Node * insertee = consolidate_arr[index];
-					Node * inserter = current;
-					this->heap_insert(insertee, inserter);
-					current = insertee;
+					this->heap_insert(consolidate_arr[index], current);
+					current = consolidate_arr[index];
 				}
 				else{
 					this->heap_insert(current, consolidate_arr[index]);
 				}
+				consolidate_arr[index] = this->Nil;
 				index = current->degree;
 			}
 			consolidate_arr[index] = current;
@@ -187,12 +187,14 @@ namespace MyFibheap {
 			this->Max = this->Nil;
 		}
 		else{
-			Node * ptr = this->Max->child;
-			do{
-				Node * tmp = ptr->right;
-				ptr->linktoroot(*this);
-				ptr = tmp;
-			}while (ptr!=this->Max->child);
+			if(this->Max->degree){
+				Node * ptr = this->Max->child;
+				do{
+					Node * tmp = ptr->right;
+					ptr->linktoroot(*this);
+					ptr = tmp;
+				}while (ptr!=this->Max->child);
+			}
 			value = this->Max->value;
 			Node * tmp = this->Max;
 			this->Max = this->Max->right;
@@ -204,6 +206,7 @@ namespace MyFibheap {
 			do{
 				if(current->key > key){
 					tmp = current;
+					key = current->key;
 				}
 				current = current->right;
 			}while(current!=this->Max);

@@ -39,4 +39,8 @@ namespace Myqueue{
 		return this->fibheap->showmax();
 	}
 
+	template<typename Type>
+	void priority_queue<Type>::pop(){
+		this->fibheap->extract_max();
+	}
 }
