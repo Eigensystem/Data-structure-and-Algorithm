@@ -1,5 +1,7 @@
 #include <cstddef>
+#include <math.h>
 #include <sys/types.h>
+#include <cmath>
 
 namespace MyFibheap {
 	template<typename KEYType, typename VALUEType> class Fibheap{
@@ -14,7 +16,9 @@ namespace MyFibheap {
 		void insert(KEYType key, VALUEType value);
 		VALUEType extract_max();
 		VALUEType showmax();
+		int calcu_size();
 		void heap_consolidate();
+		void heap_insert(Node * insertee, Node * inserter);
 	};
 
 	//Define inner class Node
@@ -25,7 +29,6 @@ namespace MyFibheap {
 		KEYType key;
 		VALUEType value;
 		int degree;
-		bool mark;
 		bool nil;
 		Node * left;
 		Node * right;
@@ -118,8 +121,57 @@ namespace MyFibheap {
 	}
 
 	template<typename KEYType, typename VALUEType>
+	int Fibheap<KEYType,VALUEType>::calcu_size(){
+		int num = this->node_num;
+		double size = (sqrt(5) + 1)/2;
+		return log(num)/log(size);
+	}
+
+	template<typename KEYType, typename VALUEType>
+	void Fibheap<KEYType,VALUEType>::heap_insert(Node * insertee, Node * inserter){
+		inserter->dellink();
+		insertee->degree += (inserter->degree + 1);
+		if(insertee->child == this->Nil){
+			insertee->child = inserter;
+			inserter->parent = insertee;
+			inserter->left = inserter;
+			inserter->right = inserter;
+		}
+		else{
+			Node * linknode = insertee->child;
+			inserter->left = linknode;
+			inserter->right = linknode->right;
+			linknode->right->left = inserter;
+			linknode->right = inserter;
+			inserter->parent = insertee;
+		}
+	}
+
+	template<typename KEYType, typename VALUEType>
 	void Fibheap<KEYType,VALUEType>::heap_consolidate(){
-		
+		int size = calcu_size()+1;
+		Node * consolidate_arr[size] = malloc(size*8);
+		for(int i=0; i<size; i++){
+			consolidate_arr[i] = this->Nil;
+		}
+		Node * current = this->Max;
+		do{
+			int index = current->degree;
+			while(consolidate_arr[index]!=this->Nil){
+				if(consolidate_arr[index]->key > current->key){
+					Node * insertee = consolidate_arr[index];
+					Node * inserter = current;
+					this->heap_insert(insertee, inserter);
+					current = insertee;
+				}
+				else{
+					this->heap_insert(current, consolidate_arr[index]);
+				}
+				index = current->degree;
+			}
+			consolidate_arr[index] = current;
+			current = current->right;
+		}while(current!=this->Max);
 	}
 
 	template<typename KEYType, typename VALUEType>
@@ -135,16 +187,29 @@ namespace MyFibheap {
 			this->Max = this->Nil;
 		}
 		else{
-			Node ptr = this->Max->child;
+			Node * ptr = this->Max->child;
 			do{
-				ptr.linktoroot(*this);
-				ptr = ptr.right;
+				Node * tmp = ptr->right;
+				ptr->linktoroot(*this);
+				ptr = tmp;
 			}while (ptr!=this->Max->child);
 			value = this->Max->value;
 			Node * tmp = this->Max;
 			this->Max = this->Max->right;
 			tmp->dellink();
 			delete tmp;
+			Node * current = this->Max;
+			KEYType key = current->key;
+			tmp = nullptr;
+			do{
+				if(current->key > key){
+					tmp = current;
+				}
+				current = current->right;
+			}while(current!=this->Max);
+			if(tmp){
+				this->Max = tmp;
+			}
 			this->heap_consolidate();
 		}
 		--this->node_num;
