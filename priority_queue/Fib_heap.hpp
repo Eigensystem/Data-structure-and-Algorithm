@@ -61,7 +61,7 @@ namespace MyFibheap {
 				Node * tmp = current->right;
 				delete current;
 				current = tmp;
-			}while(current == this->Max);
+			}while(current != this->Max);
 		}
 		delete this->Nil;
 		this->Max = nullptr;
@@ -187,18 +187,20 @@ namespace MyFibheap {
 		Node * current = this->Max;
 		do{
 			int index = current->degree;
-			while(consolidate_arr[index]!=this->Nil){
-				if(consolidate_arr[index]->key > current->key){
-					this->heap_insert(consolidate_arr[index], current);
-					current = consolidate_arr[index];
+			if(consolidate_arr[index] != current){
+				while(consolidate_arr[index]!=this->Nil){
+					if(consolidate_arr[index]->key > current->key){
+						this->heap_insert(consolidate_arr[index], current);
+						current = consolidate_arr[index];
+					}
+					else{
+						this->heap_insert(current, consolidate_arr[index]);
+					}
+					consolidate_arr[index] = this->Nil;
+					index = current->degree;
 				}
-				else{
-					this->heap_insert(current, consolidate_arr[index]);
-				}
-				consolidate_arr[index] = this->Nil;
-				index = current->degree;
+				consolidate_arr[index] = current;
 			}
-			consolidate_arr[index] = current;
 			current = current->right;
 		}while(current!=this->Max);
 	}
@@ -211,7 +213,6 @@ namespace MyFibheap {
 		else if(node_num == 1){
 			value = this->Max->value;
 			delete this->Max;
-			--node_num;
 			this->Max = this->Nil;
 		}
 		else{

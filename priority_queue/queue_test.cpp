@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ostream>
 #include "Priority_Queue.hpp"
 
 int main(){
@@ -32,7 +33,23 @@ int main(){
     p->pop();
     p->pop();
     p->pop();
+    p->pop();
+    p->pop();
+    p->pop();
+    p->pop();
+    p->pop();
+    p->pop();
+    p->pop();
+    p->pop();
+    p->pop();
+    p->pop();
+    p->pop();
+    p->pop();
+    p->pop();
+
     std::cout << p->top() << std::endl;
+    std::cout << p->size() << std::endl;
+    std::cout << p->empty() << std::endl;
     delete p;
     return 0;
 }
