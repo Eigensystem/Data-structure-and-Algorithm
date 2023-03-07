@@ -1,4 +1,5 @@
 // https://leetcode.cn/problems/zhan-de-ya-ru-dan-chu-xu-lie-lcof
+//TODO: use stack simulation
 
 #include <vector>
 
